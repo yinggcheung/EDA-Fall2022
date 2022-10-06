@@ -74,14 +74,26 @@ Exercise: build your own scatterplots of PeterPaul.chem.nutrients
 # Plot surface temperatures by day of  year. 
 # Color your points by year, and facet by lake in two rows.
 # Change the ylab name
-
+PP.ex1 <-
+  ggplot(subset(PeterPaul.chem.nutrients, depth==0),aes(x=daynum, y=temperature_C))+
+  geom_point(aes(color=year4))+
+  facet_wrap(vars(lakename),nrow=2)+
+  ylab("Temperature")
+print(PP.ex1)
 
 #2. 
 # Plot temperature by date. Color your points by depth.
 # Change the size of your point to 0.5
 # Change the color palette to magma and play with direction (+- 1), which one makes more sense?
 # Change x axis to include marker/labels every 5 years
-
+PP.ex2 <-
+  ggplot(PeterPaul.chem.nutrients, aes(x=sampledate, y=temperature_C))+
+  geom_point(aes(color=depth), size=0.5)+
+  ylab("Temperature")+
+  xlab("")+
+  scale_color_viridis(option="magma",direction=-1)+
+  scale_x_date(date_breaks ="5 years", date_labels ="%Y")
+print(PP.ex2)
 
 
 
@@ -97,7 +109,11 @@ Exercise: Plot relationships between air quality measurements
 # Make the points 50 % transparent
 # Add a line of best fit for the linear regression of these variables.
 
-
+EPA.ex3 <- 
+  ggplot(EPAair, aes(x = PM2.5, y = Ozone)) +
+  geom_point(aes(color=meanLat), alpha=0.5)+
+  geom_smooth(method = lm, color="red")
+print(EPA.ex3)
 
 
 ```
@@ -112,7 +128,22 @@ Exercise: Plot distributions of AQI values for EPAair.
 # Create several types of plots depicting PM2.5, divided by year. 
 # Choose which plot displays the data best and justify your choice. 
 
+ggplot(EPAair, aes(x = Month, y = PM2.5, color = Year))+
+  geom_point()+
+  scale_x_continuous(limits=c(1,12),breaks = c(1:12))
 
+ggplot(EPAair, aes(x = as.factor(Year), y = PM2.5))+
+  geom_boxplot()
+#better than the first one, but the years aren't sapared
+
+ggplot(EPAair, aes(x = Month, y = PM2.5))+
+  geom_point()+
+  facet_wrap(vars(Year), nrow=2)+
+  scale_x_continuous(limits=c(1,12), breaks = c(1:12))
+
+ggplot(EPAair, aes(x = as.factor(Year), y = PM2.5))+
+  geom_violin()
+# the best option, higher concentration toward the mean.
 
 ```
 
