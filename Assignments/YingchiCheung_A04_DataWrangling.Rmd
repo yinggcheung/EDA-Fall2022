@@ -10,7 +10,7 @@ geometry: margin=2.54cm
 #For it to work, the "formatR" package needs to be installed
 
 #install.packages('formatR')
-knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=45), tidy=TRUE)
 ```
 
 ## OVERVIEW
@@ -71,27 +71,27 @@ colnames(EPAair_PM25_NC2019_raw)
 ```{r}
 #3
 class(EPAair_O3_NC2018_raw$Date)
-EPAair_O3_NC2018_raw$Date <- as.Date(EPAair_O3_NC2018_raw$Date, format = "%m/%d/%y")
+EPAair_O3_NC2018_raw$Date <- as.Date(EPAair_O3_NC2018_raw$Date, format="%m/%d/%y")
 
 class(EPAair_O3_NC2019_raw$Date)
-EPAair_O3_NC2019_raw$Date <- as.Date(EPAair_O3_NC2019_raw$Date, format = "%m/%d/%y")
+EPAair_O3_NC2019_raw$Date <- as.Date(EPAair_O3_NC2019_raw$Date, format="%m/%d/%y")
 
 class(EPAair_PM25_NC2018_raw$Date)
-EPAair_PM25_NC2018_raw$Date <- as.Date(EPAair_PM25_NC2018_raw$Date, format = "%m/%d/%y")
+EPAair_PM25_NC2018_raw$Date <- as.Date(EPAair_PM25_NC2018_raw$Date, format="%m/%d/%y")
 
 class(EPAair_PM25_NC2019_raw$Date)
-EPAair_PM25_NC2019_raw$Date <- as.Date(EPAair_PM25_NC2019_raw$Date, format = "%m/%d/%y")
+EPAair_PM25_NC2019_raw$Date <- as.Date(EPAair_PM25_NC2019_raw$Date, format="%m/%d/%y")
 
 
 
 #4
-EPAair_O3_NC2018_select <- EPAair_O3_NC2018_raw%>%select("Date", "DAILY_AQI_VALUE", "Site.Name", "AQS_PARAMETER_DESC", "COUNTY", "SITE_LATITUDE", "SITE_LONGITUDE")
+EPAair_O3_NC2018_select <- select(EPAair_O3_NC2018_raw, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
-EPAair_O3_NC2019_select <- EPAair_O3_NC2019_raw%>%select("Date", "DAILY_AQI_VALUE", "Site.Name", "AQS_PARAMETER_DESC", "COUNTY", "SITE_LATITUDE", "SITE_LONGITUDE")
+EPAair_O3_NC2019_select <- select(EPAair_O3_NC2019_raw, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
-EPAair_PM25_NC2018_select <- EPAair_PM25_NC2018_raw%>%select("Date", "DAILY_AQI_VALUE", "Site.Name", "AQS_PARAMETER_DESC", "COUNTY", "SITE_LATITUDE", "SITE_LONGITUDE")
+EPAair_PM25_NC2018_select <- select(EPAair_PM25_NC2018_raw, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
-EPAair_PM25_NC2019_select <- EPAair_PM25_NC2019_raw%>%select("Date", "DAILY_AQI_VALUE", "Site.Name", "AQS_PARAMETER_DESC", "COUNTY", "SITE_LATITUDE", "SITE_LONGITUDE")
+EPAair_PM25_NC2019_select <- select(EPAair_PM25_NC2019_raw, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
 #5
 EPAair_PM25_NC2019_select <- EPAair_PM25_NC2019_select %>% mutate(AQS_PARAMETER_DESC = "PM2.5"  )
@@ -126,7 +126,6 @@ EPAair.2022 <- rbind(EPAair_O3_NC2018_select, EPAair_O3_NC2019_select, EPAair_PM
 dim(EPAair.2022)
 
 #8
-
 EPAair.2022.processed <- 
   EPAair.2022 %>%
   filter(Site.Name %in% c("Linville Falls", "Durham Armory", "Leggett", "Hattie Avenue", "Clemmons Middle", "Mendenhall School", "Frying Pan Mountain", "West Johnston Co.", "Garinger High School", "Castle Hayne", "Pitt Agri. Center", "Bryson City", "Millbrook School"))%>%
@@ -139,12 +138,13 @@ EPAair.2022.processed <-
 dim(EPAair.2022.processed)
 
 #9
-
+EPAair.2022.spread <- pivot_wider(EPAair.2022.processed, id_cols="Site.Name"|"Date", names_from = "AQS_PARAMETER_DESC", values_from = "meanAQI")
 
 #10
+dim(EPAair.2022.spread)
 
 #11
-
+write.csv(EPAair.2022.spread, row.names = FALSE, file = "./Data/Processed/EPAair_O3_PM25_NC1819_Processed.csv")
 ```
 
 
@@ -154,14 +154,20 @@ dim(EPAair.2022.processed)
 13. Call up the dimensions of the summary dataset.
 
 ```{r}
-#12a
-
-#12b
+#12
+EPAair.2022.summary <- 
+  EPAair.2022.spread %>%
+  separate(Date, into = c("Year", "Month", "Day"))%>%
+  group_by(Site.Name, Month, Year)%>%
+  summarise(meanOZONE = mean(Ozone), 
+            meanPM25 = mean(PM2.5))%>%
+  drop_na(meanOZONE, meanPM25)
 
 #13
-
+dim(EPAair.2022.summary)
 ```
 
 14. Why did we use the function `drop_na` rather than `na.omit`?
 
-> Answer: 
+> Answer: Because it is a creating tidy dataset. To get the desired result, we want to create the simplest possible code. In this case, we favor the tidyverse ("drop_na") over the functions offered by the R programming language's default installation ("na.omit").
+
