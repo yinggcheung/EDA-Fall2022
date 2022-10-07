@@ -1,6 +1,6 @@
 ---
 title: "Assignment 4: Data Wrangling"
-author: "Student Name"
+author: "Yingchi Cheung"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -33,8 +33,33 @@ The completed exercise is due on Friday, Oct7th @ 5:00pm.
 
 ```{r, message = FALSE}
 #1
+getwd()
+library(tidyverse)
+library(lubridate)
+library(dplyr)
+EPAair_O3_NC2018_raw <- read.csv("./Data/Raw/EPAair_O3_NC2018_raw.csv", stringsAsFactors = TRUE)
+EPAair_O3_NC2019_raw <- read.csv("./Data/Raw/EPAair_O3_NC2019_raw.csv", stringsAsFactors = TRUE)
+EPAair_PM25_NC2018_raw <- read.csv("./Data/Raw/EPAair_PM25_NC2018_raw.csv", stringsAsFactors = TRUE)
+EPAair_PM25_NC2019_raw <- read.csv("./Data/Raw/EPAair_PM25_NC2019_raw.csv", stringsAsFactors = TRUE)
 
 #2
+dim(EPAair_O3_NC2018_raw)
+str(EPAair_O3_NC2018_raw)
+colnames(EPAair_O3_NC2018_raw)
+
+
+dim(EPAair_O3_NC2019_raw)
+str(EPAair_O3_NC2019_raw)
+colnames(EPAair_O3_NC2019_raw)
+
+dim(EPAair_PM25_NC2018_raw)
+str(EPAair_PM25_NC2018_raw)
+colnames(EPAair_PM25_NC2018_raw)
+
+dim(EPAair_PM25_NC2019_raw)
+str(EPAair_PM25_NC2019_raw)
+colnames(EPAair_PM25_NC2019_raw)
+
 ```
 
 ## Wrangle individual datasets to create processed files.
@@ -45,12 +70,39 @@ The completed exercise is due on Friday, Oct7th @ 5:00pm.
 
 ```{r}
 #3
+class(EPAair_O3_NC2018_raw$Date)
+EPAair_O3_NC2018_raw$Date <- as.Date(EPAair_O3_NC2018_raw$Date, format = "%m/%d/%y")
+
+class(EPAair_O3_NC2019_raw$Date)
+EPAair_O3_NC2019_raw$Date <- as.Date(EPAair_O3_NC2019_raw$Date, format = "%m/%d/%y")
+
+class(EPAair_PM25_NC2018_raw$Date)
+EPAair_PM25_NC2018_raw$Date <- as.Date(EPAair_PM25_NC2018_raw$Date, format = "%m/%d/%y")
+
+class(EPAair_PM25_NC2019_raw$Date)
+EPAair_PM25_NC2019_raw$Date <- as.Date(EPAair_PM25_NC2019_raw$Date, format = "%m/%d/%y")
+
+
 
 #4
+EPAair_O3_NC2018_select <- EPAair_O3_NC2018_raw%>%select("Date", "DAILY_AQI_VALUE", "Site.Name", "AQS_PARAMETER_DESC", "COUNTY", "SITE_LATITUDE", "SITE_LONGITUDE")
+
+EPAair_O3_NC2019_select <- EPAair_O3_NC2019_raw%>%select("Date", "DAILY_AQI_VALUE", "Site.Name", "AQS_PARAMETER_DESC", "COUNTY", "SITE_LATITUDE", "SITE_LONGITUDE")
+
+EPAair_PM25_NC2018_select <- EPAair_PM25_NC2018_raw%>%select("Date", "DAILY_AQI_VALUE", "Site.Name", "AQS_PARAMETER_DESC", "COUNTY", "SITE_LATITUDE", "SITE_LONGITUDE")
+
+EPAair_PM25_NC2019_select <- EPAair_PM25_NC2019_raw%>%select("Date", "DAILY_AQI_VALUE", "Site.Name", "AQS_PARAMETER_DESC", "COUNTY", "SITE_LATITUDE", "SITE_LONGITUDE")
 
 #5
+EPAair_PM25_NC2019_select <- EPAair_PM25_NC2019_select %>% mutate(AQS_PARAMETER_DESC = "PM2.5"  )
+EPAair_PM25_NC2018_select <- EPAair_PM25_NC2018_select %>% mutate(AQS_PARAMETER_DESC = "PM2.5"  )
+
 
 #6
+write.csv(EPAair_O3_NC2018_raw, row.names = FALSE, file = "./Data/Processed/EPAair_O3_NC2018_processed.csv")
+write.csv(EPAair_O3_NC2019_raw, row.names = FALSE, file = "./Data/Processed/EPAair_O3_NC2019_processed.csv")
+write.csv(EPAair_PM25_NC2018_raw, row.names = FALSE, file = "./Data/Processed/EPAair_PM25_NC2018_processed.csv")
+write.csv(EPAair_PM25_NC2019_raw, row.names = FALSE, file = "./Data/Processed/EPAair_PM25_NC2019_processed.csv")
 
 ```
 
@@ -66,14 +118,28 @@ The completed exercise is due on Friday, Oct7th @ 5:00pm.
 
 9. Spread your datasets such that AQI values for ozone and PM2.5 are in separate columns. Each location on a specific date should now occupy only one row.
 10. Call up the dimensions of your new tidy dataset.
-11. Save your processed dataset with the following file name: "EPAair_O3_PM25_NC1718_Processed.csv"
+11. Save your processed dataset with the following file name: "EPAair_O3_PM25_NC1819_Processed.csv"
 
 ```{r}
 #7
+EPAair.2022 <- rbind(EPAair_O3_NC2018_select, EPAair_O3_NC2019_select, EPAair_PM25_NC2018_select, EPAair_PM25_NC2019_select)
+dim(EPAair.2022)
 
 #8
 
+EPAair.2022.processed <- 
+  EPAair.2022 %>%
+  filter(Site.Name %in% c("Linville Falls", "Durham Armory", "Leggett", "Hattie Avenue", "Clemmons Middle", "Mendenhall School", "Frying Pan Mountain", "West Johnston Co.", "Garinger High School", "Castle Hayne", "Pitt Agri. Center", "Bryson City", "Millbrook School"))%>%
+  group_by(Date, Site.Name, AQS_PARAMETER_DESC, COUNTY)%>%
+  summarise(meanAQI = mean(DAILY_AQI_VALUE), 
+            meanLAT = mean(SITE_LATITUDE), 
+            meanLON = mean(SITE_LONGITUDE))%>%
+  mutate(month = month(Date))%>%
+  mutate(year = year(Date))
+dim(EPAair.2022.processed)
+
 #9
+
 
 #10
 
