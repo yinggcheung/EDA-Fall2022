@@ -70,18 +70,18 @@ colnames(EPAair_PM25_NC2019_raw)
 
 ```{r}
 #3
+
+EPAair_O3_NC2018_raw$Date <- as.Date(EPAair_O3_NC2018_raw$Date, format = "%m/%d/%Y")
 class(EPAair_O3_NC2018_raw$Date)
-EPAair_O3_NC2018_raw$Date <- as.Date(EPAair_O3_NC2018_raw$Date, format="%m/%d/%y")
 
+EPAair_O3_NC2019_raw$Date <- as.Date(EPAair_O3_NC2019_raw$Date, format = "%m/%d/%Y")
 class(EPAair_O3_NC2019_raw$Date)
-EPAair_O3_NC2019_raw$Date <- as.Date(EPAair_O3_NC2019_raw$Date, format="%m/%d/%y")
 
+EPAair_PM25_NC2018_raw$Date <- as.Date(EPAair_PM25_NC2018_raw$Date, format = "%m/%d/%Y")
 class(EPAair_PM25_NC2018_raw$Date)
-EPAair_PM25_NC2018_raw$Date <- as.Date(EPAair_PM25_NC2018_raw$Date, format="%m/%d/%y")
 
+EPAair_PM25_NC2019_raw$Date <- as.Date(EPAair_PM25_NC2019_raw$Date, format = "%m/%d/%Y")
 class(EPAair_PM25_NC2019_raw$Date)
-EPAair_PM25_NC2019_raw$Date <- as.Date(EPAair_PM25_NC2019_raw$Date, format="%m/%d/%y")
-
 
 
 #4
@@ -94,15 +94,15 @@ EPAair_PM25_NC2018_select <- select(EPAair_PM25_NC2018_raw, Date, DAILY_AQI_VALU
 EPAair_PM25_NC2019_select <- select(EPAair_PM25_NC2019_raw, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
 #5
-EPAair_PM25_NC2019_select <- EPAair_PM25_NC2019_select %>% mutate(AQS_PARAMETER_DESC = "PM2.5"  )
-EPAair_PM25_NC2018_select <- EPAair_PM25_NC2018_select %>% mutate(AQS_PARAMETER_DESC = "PM2.5"  )
+EPAair_PM25_NC2019_select <- EPAair_PM25_NC2019_select %>% mutate(AQS_PARAMETER_DESC="PM2.5"  )
+EPAair_PM25_NC2018_select <- EPAair_PM25_NC2018_select %>% mutate(AQS_PARAMETER_DESC="PM2.5"  )
 
 
 #6
-write.csv(EPAair_O3_NC2018_raw, row.names = FALSE, file = "./Data/Processed/EPAair_O3_NC2018_processed.csv")
-write.csv(EPAair_O3_NC2019_raw, row.names = FALSE, file = "./Data/Processed/EPAair_O3_NC2019_processed.csv")
-write.csv(EPAair_PM25_NC2018_raw, row.names = FALSE, file = "./Data/Processed/EPAair_PM25_NC2018_processed.csv")
-write.csv(EPAair_PM25_NC2019_raw, row.names = FALSE, file = "./Data/Processed/EPAair_PM25_NC2019_processed.csv")
+write.csv(EPAair_O3_NC2018_raw, row.names=FALSE, file="./Data/Processed/EPAair_O3_NC2018_processed.csv")
+write.csv(EPAair_O3_NC2019_raw, row.names=FALSE, file="./Data/Processed/EPAair_O3_NC2019_processed.csv")
+write.csv(EPAair_PM25_NC2018_raw, row.names=FALSE, file="./Data/Processed/EPAair_PM25_NC2018_processed.csv")
+write.csv(EPAair_PM25_NC2019_raw, row.names=FALSE, file="./Data/Processed/EPAair_PM25_NC2019_processed.csv")
 
 ```
 
