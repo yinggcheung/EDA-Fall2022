@@ -82,7 +82,9 @@ PvsPO4 <-
   ggplot(NTLLTER, aes(x = po4, y = tp_ug)) +
   geom_point(aes(color = lakename)) +
   xlim(0, 50) +
-  geom_smooth(method = lm, color = "black")
+  geom_smooth(method = lm, color = "black")+
+  ylab("TP (micrograms per liter)")+
+  xlab("PO4 (micrograms per liter)")
 print(PvsPO4)
 
 ```
@@ -100,27 +102,33 @@ see <https://r-lang.com/month-abb-in-r-with-example>
 #5
 NTLLTER$month <- factor(NTLLTER$month, levels=c(1:12))
 library(cowplot)
+mnth <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+month.abb[mnth]
 
 Temperature <-
   ggplot(NTLLTER, aes(x = month, y = temperature_C)) +
   geom_boxplot(aes(color = lakename, alpha = 0.5)) +
-  scale_x_discrete(drop=FALSE)
+  scale_x_discrete(drop=FALSE)+
+  ggtitle("Temperature")+
+  ylab("°C")+
+  xlab("Month")
 print(Temperature)
 
 TP <-
   ggplot(NTLLTER, aes(x = month, y = tp_ug)) +
   geom_boxplot(aes(color = lakename, alpha = 0.5)) +
-  scale_x_discrete(drop=FALSE)
+  scale_x_discrete(drop=FALSE)+
+  labs(title="TP", y = "Micrograms Per Liter", x = "Month")
 print(TP)
 
 TN <-
   ggplot(NTLLTER, aes(x = month, y = tn_ug)) +
   geom_boxplot(aes(color = lakename, alpha = 0.5)) +
-  scale_x_discrete(drop=FALSE)
+  scale_x_discrete(drop=FALSE)+
+  labs(title="TN", y = "Micrograms Per Liter", x = "Month")
 print(TN)
 ```
 ```{r, fig.height = 8, fig.width = 5}
-month.abb
 plot_grid(Temperature + theme(legend.position = "none"), TP + theme(legend.position = "none"), TN, ncol = 1, align = "v", axis = 'l', rel_heights = c(1, 1, 1.2))
 
 ```
