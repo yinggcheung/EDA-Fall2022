@@ -223,7 +223,7 @@ gages <- NWIS_utm[county,]
 
 #24 Plot
 mapview(counties_sf_utm, col.regions = 'grey')+
-  mapview(county)+
+  mapview(county, col.regions = 'yellow')+
   mapview(gages)
 
 
