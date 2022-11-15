@@ -41,6 +41,7 @@ library(lubridate)
 library(sf)
 library(leaflet)
 library(mapview)
+library(RColorBrewer)
 
 ```
 
@@ -67,7 +68,7 @@ mapView(counties_sf)
 6. What is the EPSG code of the Counties dataset? Is this a geographic or a projected coordinate reference system? (Or, does this CRS use angular or planar coordinate units?) To what datum is this CRS associated? (Tip: look the EPSG code on <https://spatialreference.org>) 
 
 > ANSWER: 
-> The EPSG code of the counties dataset is 4269. This is a geographic coordinate reference system. North_American_Datum_1983
+> The EPSG code of the counties dataset is 4269. This is a projected coordinate reference system. North_American_Datum_1983 associated this CRS.
 
 
 ### Read in gage locations csv as a dataframe, then display the column names it contains
@@ -197,7 +198,7 @@ NWIS_utm <- st_transform(NWIS_join, crs = 32614)
 #21 Plot the data
 mapview(NWIS_utm, 
         zcol = 'gage_ht') + 
-  mapview(counties_sf_utm)
+  mapview(counties_sf_utm, zcol = 'ALAND', col.regions=brewer.pal(11, "BrBG"))
 
 ```
 
