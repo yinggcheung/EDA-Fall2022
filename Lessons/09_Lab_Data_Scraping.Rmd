@@ -105,6 +105,20 @@ ggplot(gage_data,aes(x=datetime,y=discharge_cfs)) +
 > Alter the above code so that it plots the last 24 days of flow for gage 02085070
 
 ```{r pull.and.plot.other.discharge.data}
+theURL2 <- 'https://waterdata.usgs.gov/nwis/uv?search_site_no=02085070&period=24&format=rdb'
+
+gage_data2 <- read.table(theURL2,skip = 29,header=TRUE,sep='\t',stringsAsFactors = T) 
+
+colnames(gage_data2) = c("agency_cd", "site_no", "datetime", "tz_cd",
+                        "discharge_cfs", "89192_00060_cd", "gage_ht_ft", "89193_00065_cd")
+
+gage_data2 <- gage_data2 %>% 
+  select(datetime, discharge_cfs,gage_ht_ft) %>% 
+  mutate(datetime = ymd_hm(datetime))
+
+ggplot(gage_data2,aes(x=datetime,y=discharge_cfs)) + 
+  geom_line() +
+  labs(x = "Date",y = "Discharge (cfs)")
 
 ```
 
@@ -173,7 +187,10 @@ nc_pop <-
   get_acs(geography = "county",
           variables = "B01003_001",
           state = "NC",
-          geometry = TRUE)
+          geometry = TRUE,
+          key="d4ad7874c996c7a83fec0a81466309ddc07d8e22")
+options(tigris_use_cache = TRUE)
+
 
 ggplot(nc_pop, aes(fill = estimate)) +
   geom_sf() +
@@ -206,16 +223,24 @@ The RVest scraping workflow is as follows:
 
 ```{r scrape.data.manually eval=FALSE}
 #1 Link to the web site using read_html
-the_website
+the_website<- read_html('https://www.eia.gov/electricity/state/')
 
 #2&3 Locate elements and read their text attributes into variables
-the_states <- 
-the_price <- 
-the_capacity <- 
-net_generation <- 
-total_retail <- 
-  
+the_states <- the_website %>% html_nodes('td:nth-child(1)') %>% html_text()
+the_price <- the_website %>%   html_nodes('td:nth-child(2)') %>%  html_text()
+the_capacity <- the_website %>% html_nodes('td:nth-child(3)') %>% html_text()
+net_generation <- the_website %>% html_nodes('td:nth-child(4)') %>% html_text()
+total_retail <- the_website %>% html_nodes('td:nth-child(5)') %>% html_text()
+
+
 #3 Construct a dataframe from the values
+energy_data <-
+  data.frame(
+    state = the_states,
+    price = the_price,
+    capacity = the_capacity,
+    net_generation = net_generation,
+    total_retail = total_retail)
 ```
 
 
@@ -228,23 +253,37 @@ scrape.it <- function(the_year){
 
   #Fetch the website
   #<enter code from above here> 
+  the_website<- read_html(the_url)
   
   #Scrape the data
   #<enter code from above here>
-  
+  the_states <- the_website %>% html_nodes('td:nth-child(1)') %>% html_text()
+  the_price <- the_website %>%   html_nodes('td:nth-child(2)') %>%  html_text()
+  the_capacity <- the_website %>% html_nodes('td:nth-child(3)') %>% html_text()
+  net_generation <- the_website %>% html_nodes('td:nth-child(4)') %>% html_text()
+  total_retail <- the_website %>% html_nodes('td:nth-child(5)') %>% html_text()
+
   #Convert to dataframe
   #<enter code from above here>
+  energy_data <-
+  data.frame(
+    state = the_states,
+    price = the_price,
+    capacity = the_capacity,
+    net_generation = net_generation,
+    total_retail = total_retail) %>%
+    mutate(year = the_year)
   
   #Return the dataframe
-  return(the_df)
+  return(energy_data)
 }
 
 
 # Use the above function to scrape data for 2017
-
+df2017 <- scrape.it(2017)
 
 # Map the function to scrape data from 2017 to 2019
-
+df_manyyears <- map(seq(2017,2019), scrape.it) %>% bind_rows()
 
 ```
 
