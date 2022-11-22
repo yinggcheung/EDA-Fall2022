@@ -31,6 +31,8 @@ This exercise accompanies the lessons in Environmental Data Analytics on data sc
 
 ```{r, message = FALSE}
 #1
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=70), tidy=TRUE)
+
 getwd()
 library(tidyverse)
 library(lubridate)
@@ -203,4 +205,5 @@ ggplot(A2, aes(x = Date, y = Max_Withdrawals_mgd)) +
 ```
 
 >Question: Just by looking at the plot (i.e. not running statistics), does Asheville have a trend in water usage over time?
+>
 > Asheville does have a trend in water usage over time. We can see there's an increasing trend line. Meaning that water usage increased from 2010 to 2019.
